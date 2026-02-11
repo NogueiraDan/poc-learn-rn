@@ -333,7 +333,252 @@ A POC possui dois usuários mockados para teste:
    - Você deve ser automaticamente redirecionado para o app (sem precisar fazer login novamente)
 
 ---
+## 🗺️ Fluxo de Navegação Completo
 
+### Diagrama Visual
+
+```mermaid
+flowchart TD
+    Start([App Inicia]) --> CheckAuth{Verificando<br/>Sessão...}
+    
+    CheckAuth -->|Não Autenticado| AuthScreen[🔐 AuthScreen<br/>Login/Cadastro]
+    CheckAuth -->|Autenticado| TabNav[TabNavigator]
+    
+    AuthScreen -->|Login/Cadastro<br/>Bem-sucedido| TabNav
+    
+    TabNav --> Tab1[📚 Aba Aprenda<br/>HomeScreen]
+    TabNav --> Tab2[⭐ Aba Extras<br/>Placeholder]
+    
+    Tab1 --> Module1[📱 Componentes Básicos<br/>BasicsScreen]
+    Tab1 --> Module2[🎨 Estilização<br/>StylingScreen]
+    Tab1 --> Module3[📋 Listas<br/>ListsScreen]
+    Tab1 --> Module4[📝 Formulários<br/>FormsScreen]
+    Tab1 --> Module5[🌐 Integração API<br/>APIScreen]
+    Tab1 --> Module6[💾 Armazenamento<br/>StorageScreen]
+    Tab1 --> Module7[🪝 Hooks<br/>HooksScreen]
+    Tab1 --> Module8[🔲 Modais<br/>ModalScreen]
+    Tab1 --> Module9[🎨 Context & Temas<br/>ThemeScreen]
+    Tab1 --> Module10[🛡️ Auth & Autorização<br/>ProtectedScreen]
+    
+    Module10 -->|Logout| AuthScreen
+    
+    Module1 -->|Botão Voltar| Tab1
+    Module2 -->|Botão Voltar| Tab1
+    Module3 -->|Botão Voltar| Tab1
+    Module4 -->|Botão Voltar| Tab1
+    Module5 -->|Botão Voltar| Tab1
+    Module6 -->|Botão Voltar| Tab1
+    Module7 -->|Botão Voltar| Tab1
+    Module8 -->|Botão Voltar| Tab1
+    Module9 -->|Botão Voltar| Tab1
+    Module10 -->|Botão Voltar| Tab1
+```
+
+### 🚀 Ao Abrir o App
+
+**1. App.tsx inicia** → Carrega os Providers (SafeArea, Auth, Theme)
+
+**2. AuthContext verifica sessão**
+- Busca no AsyncStorage se existe usuário/token salvo
+- **Loading de ~1 segundo** (mostra spinner)
+
+**3. Navigation.tsx decide a rota inicial:**
+
+#### ❌ Cenário A: NÃO AUTENTICADO
+```
+App → AuthScreen (Tela de Login/Cadastro)
+```
+- **Primeira tela visível**: Formulário de login
+- **Opções**:
+  - Fazer login → Vai para TabNavigator
+  - Trocar para cadastro → Mesmo AuthScreen, modo diferente
+  - Preencher demo → Auto-completa campos
+
+#### ✅ Cenário B: AUTENTICADO (ou após login)
+```
+App → TabNavigator → Aba "Aprenda" (HomeScreen)
+```
+- **Primeira tela visível**: HomeScreen com 10 cards de módulos
+- **Bottom tabs visíveis**: 
+  - 📚 Aprenda (ativa)
+  - ⭐ Extras
+
+### 🏠 Navegação Principal (HomeScreen)
+
+**HomeScreen** - Tela com ScrollView contendo 10 cards:
+
+| Card | Ao Clicar | Navega para |
+|------|-----------|-------------|
+| 📱 Componentes Básicos | `navigation.navigate('Basics')` | BasicsScreen |
+| 🎨 Estilização | `navigation.navigate('Styling')` | StylingScreen |
+| 📋 Listas & Performance | `navigation.navigate('Lists')` | ListsScreen |
+| 📝 Formulários | `navigation.navigate('Forms')` | FormsScreen |
+| 🌐 Integração API | `navigation.navigate('API')` | APIScreen |
+| 💾 Armazenamento | `navigation.navigate('Storage')` | StorageScreen |
+| 🪝 Hooks Essenciais | `navigation.navigate('Hooks')` | HooksScreen |
+| 🔲 Modais | `navigation.navigate('Modal')` | ModalScreen |
+| 🎨 Context API & Temas | `navigation.navigate('Theme')` | ThemeScreen |
+| 🛡️ Autenticação & Autorização | `navigation.navigate('Protected')` | ProtectedScreen |
+
+### 🔄 Dentro de Cada Tela de Módulo
+
+**Todas as telas de módulo têm:**
+
+1. **Header com botão voltar** (← no topo)
+   - Clica no voltar → Volta para HomeScreen
+   - Gesto de swipe (iOS) → Volta para HomeScreen
+
+2. **ScrollView com conteúdo**
+   - Explicações teóricas
+   - Exemplos práticos interativos
+   - Código comentado
+
+### 📑 Tab Navigation (Bottom Tabs)
+
+**Sempre visíveis após autenticação:**
+
+#### 📚 Aba "Aprenda"
+- Componente: **HomeScreen**
+- Conteúdo: 10 cards de módulos
+- Ao tocar: Abre módulo correspondente
+
+#### ⭐ Aba "Extras"
+- Componente: **Placeholder** (tela de exemplo)
+- Conteúdo: Mensagem explicativa
+- **Finalidade**: Demonstrar navegação por abas
+
+**Troca entre abas:**
+- Toque na aba desejada
+- Estado de cada aba é preservado (ao voltar, está no mesmo lugar)
+
+### 🔐 Fluxo de Autenticação Detalhado
+
+#### Login/Cadastro (AuthScreen)
+
+**1. Modo Login (padrão):**
+```
+Preenche email + senha → Clica "Entrar"
+  ↓
+Valida campos → Chama signIn()
+  ↓
+Salva no AsyncStorage → Atualiza estado global
+  ↓
+Navigation detecta isAuthenticated=true
+  ↓
+Redireciona automaticamente para TabNavigator (HomeScreen)
+```
+
+**2. Modo Cadastro:**
+```
+Clica "Cadastre-se" → Muda para modo signup
+  ↓
+Preenche nome + email + senha → Clica "Cadastrar"
+  ↓
+Valida campos → Chama signUp()
+  ↓
+Cria usuário → Salva no AsyncStorage
+  ↓
+Redireciona automaticamente para TabNavigator
+```
+
+#### Logout (ProtectedScreen)
+
+```
+Na tela "🛡️ Auth & Autorização" → Clica "🚪 Sair"
+  ↓
+Alert de confirmação → Clica "Sair"
+  ↓
+signOut() remove AsyncStorage
+  ↓
+Navigation detecta isAuthenticated=false
+  ↓
+Redireciona automaticamente para AuthScreen
+```
+
+### 🔄 Auto-Login
+
+**Ao abrir o app novamente:**
+
+```
+App inicia → AuthContext.useEffect()
+  ↓
+Busca AsyncStorage por token/user
+  ↓
+Se encontrou → setUser(userData) + setLoading(false)
+  ↓
+Navigation vê isAuthenticated=true
+  ↓
+Vai direto para TabNavigator (não mostra login)
+```
+
+### 📊 Stack de Navegação (Estrutura Técnica)
+
+```
+NavigationContainer
+├── Stack Navigator (Root)
+│   │
+│   ├── [NÃO AUTENTICADO]
+│   │   └── Auth (AuthScreen)
+│   │
+│   └── [AUTENTICADO]
+│       ├── Home (TabNavigator)
+│       │   ├── Tab: Aprenda (HomeScreen)
+│       │   └── Tab: Extras (Placeholder)
+│       │
+│       ├── Basics (BasicsScreen)
+│       ├── Styling (StylingScreen)
+│       ├── Lists (ListsScreen)
+│       ├── Forms (FormsScreen)
+│       ├── API (APIScreen)
+│       ├── Storage (StorageScreen)
+│       ├── Hooks (HooksScreen)
+│       ├── Modal (ModalScreen)
+│       ├── Theme (ThemeScreen)
+│       └── Protected (ProtectedScreen)
+```
+
+### 🎯 Resumo: Fluxo Típico de Uso
+
+**Primeira vez usando o app:**
+```
+1. Abre app → Loading (1s) → AuthScreen
+2. Faz login → HomeScreen (aba Aprenda)
+3. Clica "📱 Componentes Básicos" → BasicsScreen
+4. Lê conteúdo, desliza para voltar → HomeScreen
+5. Clica "🎨 Estilização" → StylingScreen
+6. Clica voltar no header → HomeScreen
+7. Toca aba "⭐ Extras" → Placeholder
+8. Toca aba "📚 Aprenda" → HomeScreen
+9. Clica "🛡️ Auth" → ProtectedScreen
+10. Clica "Sair" → Confirma → AuthScreen
+```
+
+**Reabre app (com sessão salva):**
+```
+1. Abre app → Loading (1s) → HomeScreen (auto-login!)
+2. Continua navegando normalmente
+```
+
+### 💡 Dicas de Navegação
+
+**Voltar para HomeScreen de qualquer tela:**
+- Toque no botão "←" no header
+- Ou deslize da borda esquerda (iOS)
+
+**Ver todas as telas:**
+- Sempre volte para HomeScreen (aba Aprenda)
+- Lá estão os 10 cards para acessar tudo
+
+**Trocar de usuário:**
+- Vá em "🛡️ Auth & Autorização"
+- Faça logout
+- Faça login com outro email
+
+**Testar auto-login:**
+- Feche o app completamente (force quit)
+- Reabra → Deve ir direto para HomeScreen
+
+---
 ## �📦 Bibliotecas Recomendadas
 
 ### Navegação
