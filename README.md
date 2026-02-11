@@ -25,7 +25,7 @@ poc-learn-rn/
 ├── src/
 │   ├── navigation/           # Configuração de rotas
 │   │   ├── Navigation.tsx      # Stack Navigator principal
-│   │   └── TabNavigator.tsx    # Bottom Tabs
+│   │   └── TabNavigator.tsx    # Bottom Tabs + Extras Stack
 │   ├── screens/              # Telas da aplicação
 │   │   ├── HomeScreen.tsx       # Tela inicial
 │   │   ├── BasicsScreen.tsx     # Componentes básicos
@@ -38,7 +38,10 @@ poc-learn-rn/
 │   │   ├── ModalScreen.tsx      # Modais e Bottom Sheets
 │   │   ├── ThemeScreen.tsx      # Context API e Temas
 │   │   ├── AuthScreen.tsx       # Login e Cadastro
-│   │   └── ProtectedScreen.tsx  # Exemplo de tela protegida
+│   │   ├── ProtectedScreen.tsx  # Exemplo de tela protegida
+│   │   ├── ExtrasHomeScreen.tsx # Menu da aba Extras
+│   │   ├── ProfileScreen.tsx    # Perfil do usuário
+│   │   └── SettingsScreen.tsx   # Configurações do app
 │   ├── contexts/             # Context API
 │   │   ├── ThemeContext.tsx    # Tema global
 │   │   └── AuthContext.tsx     # Autenticação global
@@ -110,7 +113,7 @@ poc-learn-rn/
 ### 10. 📑 Tab Navigation (TabNavigator)
 - **Bottom Tabs**: Navegação por abas na parte inferior
 - **Tab Icons**: Ícones customizados para cada aba
-- **Nested Navigation**: Tabs contendo stacks
+- **Nested Navigation**: Stack Navigator dentro de Tab Navigator
 - **Tab Customization**: Cores, estilos e badges
 
 ### 11. 🔐 Autenticação & Autorização (AuthScreen + ProtectedScreen)
@@ -122,6 +125,32 @@ poc-learn-rn/
 - **Autorização (RBAC)**: Permissões baseadas em roles (admin vs user)
 - **Auto-login**: Restauração automática de sessão
 - **Validação de Formulários**: Email e senha
+
+### 12. 👤 Perfil do Usuário (ProfileScreen)
+- **Exibição de Dados**: Informações do usuário logado via Context
+- **Modo de Edição**: Toggle entre visualização e edição
+- **Avatar Placeholder**: Avatar baseado na inicial do nome
+- **Formulários**: TextInput com diferentes tipos (text, phone-pad, textarea)
+- **Campos Editáveis vs Não Editáveis**: Email bloqueado, nome editável
+- **Confirmação de Ações**: Alert para salvar/cancelar alterações
+- **Estatísticas**: Cards com informações visuais
+- **Zona de Perigo**: Ações críticas (alterar senha, excluir conta)
+
+### 13. ⚙️ Configurações (SettingsScreen)
+- **Switch Components**: Toggles para ativar/desativar funcionalidades
+- **Integração com Theme**: Tema escuro funcional via Context API
+- **Seções Agrupadas**: Organização visual por categorias
+- **Platform-specific UI**: Diferenças entre iOS e Android
+- **Lista de Opções**: Navegação para sub-configurações
+- **Informações do App**: Versão, build, termos de uso
+- **Armazenamento**: Informações sobre cache e dados
+
+### 14. 🏠 Menu Extras (ExtrasHomeScreen)
+- **Nested Navigation**: Stack Navigator dentro de Tab Navigator
+- **Cards de Navegação**: Menu visual para acessar recursos
+- **User Info Card**: Exibição de dados do usuário logado
+- **Layout Responsivo**: Cards com ícones e descrições
+- **Demonstração de Navegação Aninhada**: Exemplo prático de estrutura complexa
 
 ---
 
@@ -347,7 +376,7 @@ flowchart TD
     AuthScreen -->|Login/Cadastro<br/>Bem-sucedido| TabNav
     
     TabNav --> Tab1[📚 Aba Aprenda<br/>HomeScreen]
-    TabNav --> Tab2[⭐ Aba Extras<br/>Placeholder]
+    TabNav --> Tab2[⭐ Aba Extras<br/>ExtrasStack]
     
     Tab1 --> Module1[📱 Componentes Básicos<br/>BasicsScreen]
     Tab1 --> Module2[🎨 Estilização<br/>StylingScreen]
@@ -360,7 +389,13 @@ flowchart TD
     Tab1 --> Module9[🎨 Context & Temas<br/>ThemeScreen]
     Tab1 --> Module10[🛡️ Auth & Autorização<br/>ProtectedScreen]
     
+    Tab2 --> ExtrasHome[🏠 Menu Extras<br/>ExtrasHomeScreen]
+    ExtrasHome --> Profile[👤 Perfil<br/>ProfileScreen]
+    ExtrasHome --> Settings[⚙️ Configurações<br/>SettingsScreen]
+    
     Module10 -->|Logout| AuthScreen
+    Profile -->|Botão Voltar| ExtrasHome
+    Settings -->|Botão Voltar| ExtrasHome
     
     Module1 -->|Botão Voltar| Tab1
     Module2 -->|Botão Voltar| Tab1
@@ -443,9 +478,13 @@ App → TabNavigator → Aba "Aprenda" (HomeScreen)
 - Ao tocar: Abre módulo correspondente
 
 #### ⭐ Aba "Extras"
-- Componente: **Placeholder** (tela de exemplo)
-- Conteúdo: Mensagem explicativa
-- **Finalidade**: Demonstrar navegação por abas
+- Componente: **ExtrasStackNavigator** (Stack aninhado)
+- Conteúdo: Menu com 2 opções + navegação para sub-telas
+- **Finalidade**: Demonstrar navegação aninhada (Stack dentro de Tab)
+- **Telas**:
+  - **ExtrasHomeScreen**: Menu principal com cards
+  - **ProfileScreen**: Perfil do usuário com edição
+  - **SettingsScreen**: Configurações do app
 
 **Troca entre abas:**
 - Toque na aba desejada
@@ -523,7 +562,10 @@ NavigationContainer
 │   └── [AUTENTICADO]
 │       ├── Home (TabNavigator)
 │       │   ├── Tab: Aprenda (HomeScreen)
-│       │   └── Tab: Extras (Placeholder)
+│       │   └── Tab: Extras (ExtrasStack) ← NESTED NAVIGATION
+│       │       ├── ExtrasHome (ExtrasHomeScreen)
+│       │       ├── Profile (ProfileScreen)
+│       │       └── Settings (SettingsScreen)
 │       │
 │       ├── Basics (BasicsScreen)
 │       ├── Styling (StylingScreen)
@@ -547,10 +589,14 @@ NavigationContainer
 4. Lê conteúdo, desliza para voltar → HomeScreen
 5. Clica "🎨 Estilização" → StylingScreen
 6. Clica voltar no header → HomeScreen
-7. Toca aba "⭐ Extras" → Placeholder
-8. Toca aba "📚 Aprenda" → HomeScreen
-9. Clica "🛡️ Auth" → ProtectedScreen
-10. Clica "Sair" → Confirma → AuthScreen
+7. Toca aba "⭐ Extras" → ExtrasHomeScreen
+8. Clica card "👤 Meu Perfil" → ProfileScreen
+9. Clica "✏️ Editar" → Edita campos → Clica "Salvar"
+10. Volta para ExtrasHome → Clica "⚙️ Configurações" → SettingsScreen
+11. Ativa toggle "Tema Escuro" → App muda para dark mode
+12. Toca aba "📚 Aprenda" → HomeScreen
+13. Clica "🛡️ Auth" → ProtectedScreen
+14. Clica "Sair" → Confirma → AuthScreen
 ```
 
 **Reabre app (com sessão salva):**
