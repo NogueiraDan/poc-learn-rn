@@ -107,20 +107,14 @@ export default function HooksScreen() {
   // ============================================
   // 2. useEffect - Efeitos colaterais
   // ============================================
-  const [renderCount, setRenderCount] = useState(0);
-  
-  // Effect que roda em TODA renderização
-  useEffect(() => {
-    setRenderCount(c => c + 1);
-  });
   
   // Effect que roda apenas uma vez (mount)
   useEffect(() => {
-    console.log('Componente montado!');
+    console.log('✅ Componente montado!');
     
     // Cleanup function - roda no unmount
     return () => {
-      console.log('Componente desmontado!');
+      console.log('❌ Componente desmontado!');
     };
   }, []); // Array vazio = apenas no mount
   
@@ -198,7 +192,7 @@ export default function HooksScreen() {
         {/* Status do App */}
         <View style={styles.statusBar}>
           <Text style={styles.statusText}>
-            📱 App: {appState} | 🔄 Renders: {renderCount}
+            📱 App State: {appState}
           </Text>
         </View>
 
@@ -287,21 +281,22 @@ setCount(prev => prev + 1);`}
               
               <View style={styles.codeBlock}>
                 <Text style={styles.codeText}>
-                  {`// Roda em TODA renderização
+                  {`// ⚠️ Roda em TODA renderização (CUIDADO!)
+// Apenas para logs, NUNCA faça setState aqui!
 useEffect(() => {
   console.log('Renderizou');
-});
+}); // Sem array de dependências
 
-// Roda apenas uma vez (mount)
+// ✅ Roda apenas uma vez (mount)
 useEffect(() => {
   console.log('Montou');
   return () => console.log('Desmontou');
-}, []);
+}, []); // Array vazio
 
-// Roda quando dependência muda
+// ✅ Roda quando dependência muda
 useEffect(() => {
   console.log('Nome:', name);
-}, [name]);`}
+}, [name]); // Observa 'name'`}
                 </Text>
               </View>
             </View>
