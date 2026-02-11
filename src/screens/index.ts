@@ -15,3 +15,6 @@ export { default as ModalScreen } from './ModalScreen';
 export { default as ThemeScreen } from './ThemeScreen';
 export { default as AuthScreen } from './AuthScreen';
 export { default as ProtectedScreen } from './ProtectedScreen';
+export { default as ExtrasHomeScreen } from './ExtrasHomeScreen';
+export { default as ProfileScreen } from './ProfileScreen';
+export { default as SettingsScreen } from './SettingsScreen';

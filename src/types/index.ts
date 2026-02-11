@@ -77,3 +77,10 @@ export type TabParamList = {
   LearnTab: undefined;
   ExtrasTab: undefined;
 };
+
+// Tipo para o Stack Navigator dentro da aba Extras
+export type ExtrasStackParamList = {
+  ExtrasHome: undefined;
+  Profile: undefined;
+  Settings: undefined;
+};

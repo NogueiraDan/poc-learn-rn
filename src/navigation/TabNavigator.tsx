@@ -11,14 +11,71 @@
  */
 
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { Text } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import type { TabParamList } from '../types';
-import { HomeScreen } from '../screens';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import type { TabParamList, ExtrasStackParamList } from '../types';
+import { 
+  HomeScreen, 
+  ExtrasHomeScreen, 
+  ProfileScreen, 
+  SettingsScreen 
+} from '../screens';
 
 // Criação do Bottom Tab Navigator
 // Isso cria um componente que renderiza abas na parte inferior da tela
 const Tab = createBottomTabNavigator<TabParamList>();
+
+// Criação do Stack Navigator para a aba Extras
+// Nested navigation: Stack dentro de Tab
+const ExtrasStack = createNativeStackNavigator<ExtrasStackParamList>();
+
+/**
+ * ExtrasStackNavigator Component
+ * -------------------------------
+ * Stack Navigator aninhado dentro da aba Extras
+ * 
+ * CONCEITO: NESTED NAVIGATION
+ * - Uma aba pode ter seu próprio Stack Navigator
+ * - Permite navegação entre telas dentro da aba
+ * - Mantém o histórico de navegação independente
+ * 
+ * ESTRUTURA:
+ * - ExtrasHome: Menu principal da aba Extras
+ * - Profile: Perfil do usuário
+ * - Settings: Configurações do app
+ */
+function ExtrasStackNavigator() {
+  return (
+    <ExtrasStack.Navigator
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: '#2196F3',
+        },
+        headerTintColor: '#fff',
+        headerTitleStyle: {
+          fontWeight: 'bold',
+        },
+      }}
+    >
+      <ExtrasStack.Screen 
+        name="ExtrasHome" 
+        component={ExtrasHomeScreen}
+        options={{ title: 'Extras' }}
+      />
+      <ExtrasStack.Screen 
+        name="Profile" 
+        component={ProfileScreen}
+        options={{ title: 'Meu Perfil' }}
+      />
+      <ExtrasStack.Screen 
+        name="Settings" 
+        component={SettingsScreen}
+        options={{ title: 'Configurações' }}
+      />
+    </ExtrasStack.Navigator>
+  );
+}
 
 /**
  * TabNavigator Component
@@ -91,80 +148,30 @@ export default function TabNavigator() {
       {/* 
         ABA SECUNDÁRIA: Extras
         ----------------------
-        Placeholder para funcionalidades extras
-        Em um app real, poderia conter:
-        - Perfil do usuário
-        - Configurações
-        - Favoritos
-        - Etc.
+        Contém um Stack Navigator com:
+        - ExtrasHome: Menu de opções
+        - Profile: Perfil do usuário
+        - Settings: Configurações do app
+        
+        NESTED NAVIGATION:
+        Esta é uma demonstração de navegação aninhada (Stack dentro de Tab)
+        Cada aba pode ter seu próprio navegador interno
       */}
       <Tab.Screen 
         name="ExtrasTab" 
-        component={ExtrasPlaceholder}
+        component={ExtrasStackNavigator}
         options={{
           tabBarIcon: ({ color }) => (
             <Text style={{ fontSize: 24, color }}>⭐</Text>
           ),
           tabBarLabel: 'Extras',
+          // Remove header da Tab porque ExtrasStack já tem header próprio
+          headerShown: false,
         }}
       />
     </Tab.Navigator>
   );
 }
-
-/**
- * ExtrasPlaceholder Component
- * ---------------------------
- * Componente temporário para a aba "Extras"
- * 
- * Em um app real, isso seria substituído por:
- * - Stack Navigator com várias telas
- * - Tela de perfil
- * - Tela de configurações
- * - Etc.
- */
-function ExtrasPlaceholder() {
-  return (
-    <View style={placeholderStyles.container}>
-      <Text style={placeholderStyles.icon}>⭐</Text>
-      <Text style={placeholderStyles.title}>Aba Extras</Text>
-      <Text style={placeholderStyles.description}>
-        Esta aba é um placeholder. Em um app real, você colocaria aqui:{'\n\n'}
-        • Perfil do usuário{'\n'}
-        • Configurações{'\n'}
-        • Favoritos{'\n'}
-        • Histórico
-      </Text>
-    </View>
-  );
-}
-
-// Estilos do placeholder
-const placeholderStyles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#f5f5f5',
-    padding: 20,
-  },
-  icon: {
-    fontSize: 48,
-    marginBottom: 20,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 10,
-    color: '#333',
-  },
-  description: {
-    textAlign: 'center',
-    color: '#666',
-    lineHeight: 24,
-    maxWidth: 300,
-  },
-});
 
 /**
  * NOTAS IMPORTANTES SOBRE TAB NAVIGATION:
