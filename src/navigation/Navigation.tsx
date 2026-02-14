@@ -19,20 +19,30 @@
  * - Podem ser aninhadas (ex: Tab dentro de Stack)
  * 
  * ESTRUTURA ATUAL:
- * NavigationContainer
- *   └── Stack Navigator (Root)
- *       ├── TabNavigator (Home)
- *       │   ├── Tab 1: Aprenda (HomeScreen)
- *       │   └── Tab 2: Extras (Placeholder)
- *       ├── Basics Screen
- *       ├── Styling Screen
- *       ├── Lists Screen
- *       ├── Forms Screen
- *       ├── API Screen
- *       ├── Storage Screen
- *       ├── Hooks Screen
- *       ├── Modal Screen
- *       └── Theme Screen
+NavigationContainer
+├── Stack Navigator (Root)
+│   │
+│   ├── [NÃO AUTENTICADO]
+│   │   └── Auth (AuthScreen)
+│   │
+│   └── [AUTENTICADO]
+│       ├── Home (TabNavigator)
+│       │   ├── Tab: Aprenda (HomeScreen)
+│       │   └── Tab: Extras (ExtrasStack) ← NESTED NAVIGATION
+│       │       ├── ExtrasHome (ExtrasHomeScreen)
+│       │       ├── Profile (ProfileScreen)
+│       │       └── Settings (SettingsScreen)
+│       │
+│       ├── Basics (BasicsScreen)
+│       ├── Styling (StylingScreen)
+│       ├── Lists (ListsScreen)
+│       ├── Forms (FormsScreen)
+│       ├── API (APIScreen)
+│       ├── Storage (StorageScreen)
+│       ├── Hooks (HooksScreen)
+│       ├── Modal (ModalScreen)
+│       ├── Theme (ThemeScreen)
+│       └── Protected (ProtectedScreen)
  */
 
 import React from 'react';
